@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.wallethub.example</groupId>
+	<artifactId>wallethub</artifactId>
+	<packaging>jar</packaging>
+	<version>1.0-SNAPSHOT</version>
+	<name>wallethub-Web</name>
+	<url>https://www.wallethub.com/</url>
+
+	<properties>
+		<selenium.version>3.14.0</selenium.version>
+		<testng.version>7.3.0</testng.version>
+		<compiler.version>1.8</compiler.version>
+		<log4j.version>1.2.17</log4j.version>
+		<faker.version>0.16</faker.version>
+		<extentreports.version>3.1.5</extentreports.version>
+		<maven.compiler.version>3.3</maven.compiler.version>
+		<surefire.version>2.21.0</surefire.version>
+		<maven.cleanUp.version>3.1.0</maven.cleanUp.version>
+		<suiteFile>suites/qa-regression.xml</suiteFile>
+		<suiteFiles>${suiteFile}</suiteFiles>
+		<aspectj.version>1.8.10</aspectj.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<allure.verson>2.13.8</allure.verson>
+		<allure.report.version>2.9</allure.report.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.testng</groupId>
+			<artifactId>testng</artifactId>
+			<version>${testng.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<!-- Do not Remove it. This will required, for sun Java in future. -->
+		<!-- <dependency> <groupId>com.oracle</groupId> <artifactId>javaFX</artifactId> 
+			<version>2.2</version> <scope>system</scope> <systemPath>${project.basedir}/src/main/resources/jarFiles/jfxrt.jar</systemPath> 
+			</dependency> -->
+
+		<dependency>
+			<groupId>com.github.javafaker</groupId>
+			<artifactId>javafaker</artifactId>
+			<version>${faker.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>5.0.3</version>
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-server</artifactId>
+			<version>${selenium.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.aventstack</groupId>
+			<artifactId>extentreports</artifactId>
+			<version>${extentreports.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.qameta.allure</groupId>
+			<artifactId>allure-testng</artifactId>
+			<version>${allure.verson}</version>
+		</dependency>
+
+		<!-- Required as facing issues in Windows to bind xml files -->
+		<dependency>
+			<groupId>javax.xml.bind</groupId>
+			<artifactId>jaxb-api</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.11.0</version>
+		</dependency>
+
+	</dependencies>
+
+
+	<profiles>
+		<profile>
+			<id>gamma</id>
+			<properties>
+				<env>gamma</env>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<env>prod</env>
+			</properties>
+		</profile>
+		<profile>
+			<id>local</id>
+			<properties>
+				<env>local</env>
+			</properties>
+		</profile>
+	</profiles>
+
+	<build>
+		<pluginManagement>
+			<plugins>
+
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>${maven.compiler.version}</version>
+
+					<configuration>
+						<source>${compiler.version}</source>
+						<target>${compiler.version}</target>
+					</configuration>
+
+				</plugin>
+				<!-- Following plugin executes the testng tests -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-surefire-plugin</artifactId>
+					<version>${surefire.version}</version>
+					<configuration>
+						<suiteXmlFiles>
+							<!-- <suiteXmlFile>testng.xml</suiteXmlFile> -->
+							<suiteXmlFile>${suiteFiles}</suiteXmlFile>
+						</suiteXmlFiles>
+						<argLine>
+							-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"
+						</argLine>
+						<systemPropertyVariables>
+							<environment>${env}</environment>
+						</systemPropertyVariables>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>org.aspectj</groupId>
+							<artifactId>aspectjweaver</artifactId>
+							<version>${aspectj.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+
+				<plugin>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>${maven.cleanUp.version}</version>
+					<configuration>
+						<filesets>
+							<fileset>
+								<directory>${basedir}</directory>
+								<includes>
+									<include>*.html</include>
+								</includes>
+							</fileset>
+							<fileset>
+								<directory>${basedir}/src/main/resources/</directory>
+								<includes>
+									<include>*Generated.properties</include>
+								</includes>
+								<excludes>
+									<exclude>*template.html</exclude>
+								</excludes>
+							</fileset>
+							<fileset>
+								<directory>${basedir}/allure-results</directory>
+							</fileset>
+							<fileset>
+								<directory>${basedir}/test-output</directory>
+							</fileset>
+						</filesets>
+					</configuration>
+				</plugin>
+
+			</plugins>
+		</pluginManagement>
+	</build>
+
+
+	<reporting>
+		<excludeDefaults>true</excludeDefaults>
+		<plugins>
+			<plugin>
+				<groupId>io.qameta.allure</groupId>
+				<artifactId>allure-maven</artifactId>
+				<version>${allure.report.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<description>This Project is for Demo purpose for wallethub</description>
+</project>

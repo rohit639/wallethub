@@ -1,0 +1,15 @@
+/target/
+/test-output/
+/logs/
+/reports/
+/.classpath
+/.project
+/.DS_Store
+/.settings/
+src/main/resources/mac/.DS_Store
+*.html
+/allure-results/
+/bin/
+.idea/
+src/main/resources/CashfreeGenerated.properties
+*.iml
